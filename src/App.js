@@ -1,23 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import { useEffect, useState } from "react";
+
+import EventParent from "./components/EventParent";
+import { useDispatch, useSelector } from "react-redux";
 
 function App() {
+  //const [eventList, setEventList] = useState([]);
+  const eventList = useSelector((state) => state.events);
+  const dispatch = useDispatch();
+  const selectedEvents = eventList.filter((event) => event.selected);
+  const notSelectedEvents = eventList.filter((event) => !event.selected);
+  console.log("selectedEvents", selectedEvents);
+  useEffect(() => {
+    fetch("https://run.mocky.io/v3/2744c231-8991-4ae8-bc45-1f645437585a")
+      .then((response) => response.json())
+      .then((jsonResp) => {
+        //console.log("Response: ", jsonResp);
+        dispatch({ type: "all-events", payload: jsonResp });
+      });
+  }, []);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <EventParent eventList={notSelectedEvents} />
+      {selectedEvents && selectedEvents.length > 0 && (
+        <EventParent isSelected="true" eventList={selectedEvents} />
+      )}
     </div>
   );
 }
